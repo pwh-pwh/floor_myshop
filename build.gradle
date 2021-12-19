@@ -34,6 +34,9 @@ dependencies {
 
 // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-generator
     implementation 'com.baomidou:mybatis-plus-generator:3.5.1'
+    // https://mvnrepository.com/artifact/com.alibaba/fastjson
+    implementation 'com.alibaba:fastjson:1.2.78'
+
 
 }
 

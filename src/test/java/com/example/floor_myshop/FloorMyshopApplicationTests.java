@@ -3,14 +3,22 @@ package com.example.floor_myshop;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import com.example.floor_myshop.entity.Person;
+import com.example.floor_myshop.mapper.AccountMapper;
+import com.example.floor_myshop.mapper.PersonMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 
 @SpringBootTest
 class FloorMyshopApplicationTests {
-
+    @Autowired
+    PersonMapper personMapper;
     @Test
     void contextLoads() {
     }
@@ -23,6 +31,21 @@ class FloorMyshopApplicationTests {
                 .packageConfig(builder -> builder.parent("com.example.floor_myshop"))
                 .execute();
 
+    }
+
+    @Test
+    void testMapper() {
+        Person person = new Person();
+        person.setName("tom");
+        person.setPhone("1100221");
+        person.setCreateTime(LocalDateTime.now());
+        person.setLastEditTime(LocalDateTime.now());
+        person.setEmail("fjeojf@qq.com");
+        person.setGender("男");
+        person.setProfileImg("fjeo.jpg");
+        person.setAdminFlag(1);
+
+        personMapper.insert(person);
     }
 
 }
