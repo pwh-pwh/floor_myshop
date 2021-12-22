@@ -2,8 +2,7 @@ package com.example.floor_myshop.controller;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @author coderpwh
  * @since 2021-12-19
  */
-@Controller
+@RestController
 @RequestMapping("/category")
 public class CategoryController {
 

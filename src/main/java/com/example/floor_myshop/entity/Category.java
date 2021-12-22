@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author coderpwh
@@ -43,7 +43,7 @@ public class Category implements Serializable {
         this.categoryId = categoryId;
     }
 
-    public String getCategoryName() {
+    public  String getCategoryName() {
         return categoryName;
     }
 
