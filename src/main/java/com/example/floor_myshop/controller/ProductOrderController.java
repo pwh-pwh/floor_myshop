@@ -1,16 +1,27 @@
 package com.example.floor_myshop.controller;
 
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.example.floor_myshop.conditon.OrderCondition;
+import com.example.floor_myshop.entity.Product;
 import com.example.floor_myshop.entity.ProductOrder;
 import com.example.floor_myshop.model.ApiResponse;
 import com.example.floor_myshop.service.IProductOrderService;
 import com.example.floor_myshop.service.IProductService;
 import com.example.floor_myshop.vo.OrderVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.example.floor_myshop.util.ControllerUtils.checkALessThanB;
+import static com.example.floor_myshop.util.ControllerUtils.checkALessThanBOnLocalDateTime;
 
 /**
  * <p>
@@ -31,12 +42,41 @@ public class ProductOrderController {
 
 
 
-//    @GetMapping("/getOrderList")
-//    public ApiResponse getOrderList(
-//            @RequestBody OrderCondition orderCondition
-//            ){
-//
-//    }
+    @PostMapping("/getOrderList")
+    public ApiResponse getOrderList(
+            @RequestBody OrderCondition orderCondition
+            ){
+        Map<SFunction<ProductOrder, ?>, Object> map = new HashMap<>();
+        map.put(ProductOrder::getOrderId,orderCondition.getOrderId());
+        map.put(ProductOrder::getShopId,orderCondition.getShopId());
+        map.put(ProductOrder::getLogisticsStatus,orderCondition.getLogisticsStatus());
+        map.put(ProductOrder::getLogisticsId,orderCondition.getLogisticsId());
+        map.put(ProductOrder::getUserId,orderCondition.getUserId());
+        map.put(ProductOrder::getIsDeleted,orderCondition.getIsDeleted());
+        map.put(ProductOrder::getOrderState,orderCondition.getOrderState());
+        map.put(ProductOrder::getLogisticsOrderNumber,orderCondition.getLogisticsOrderNumber());
+        final List<ProductOrder> list = productOrderService.list(Wrappers.<ProductOrder>lambdaQuery()
+                .like(StringUtils.isNotBlank(orderCondition.getAddress()), ProductOrder::getAddress, orderCondition.getAddress())
+                .like(StringUtils.isNotBlank(orderCondition.getReceiverName()), ProductOrder::getReceiverName, orderCondition.getReceiverName())
+                .like(StringUtils.isNotBlank(orderCondition.getReceiverPhone()), ProductOrder::getReceiverPhone, orderCondition.getReceiverPhone())
+                .between(checkALessThanBOnLocalDateTime(orderCondition.getMinCreateTime(),orderCondition.getMaxCreateTime()),
+                        ProductOrder::getCreateTime,orderCondition.getMinCreateTime(),orderCondition.getMaxCreateTime()
+                )
+                .between(checkALessThanB(orderCondition.getMinAmount(),orderCondition.getMaxAmount(),0),
+                        ProductOrder::getAmount,orderCondition.getMinAmount(),orderCondition.getMaxAmount()
+                )
+                .allEq(map, false)
+        );
+        final List<OrderVo> collect = list.stream().map(new Function<ProductOrder, OrderVo>() {
+            @Override
+            public OrderVo apply(ProductOrder productOrder) {
+                final Product prot = productService.getOne(Wrappers.<Product>lambdaQuery().eq(Product::getProductId, orderCondition.getProductId()));
+                return productOrder.toOrderVo(orderCondition.getShopName(), orderCondition.getShopImg(),
+                        prot.getNormalPrice(), null, null);
+            }
+        }).collect(Collectors.toList());
+        return ApiResponse.success("获取订单列表成功",collect);
+    }
 
     @PostMapping("/updateOrder")
     public ApiResponse<OrderVo> updateOrder(

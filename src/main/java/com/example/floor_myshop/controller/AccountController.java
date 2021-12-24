@@ -16,5 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/account")
 public class AccountController {
 
+//    @PostMapping("/register")
+//    public ApiResponse register(@RequestBody Account account){
+//
+//    }
+
 }
 

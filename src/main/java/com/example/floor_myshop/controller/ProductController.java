@@ -1,9 +1,6 @@
 package com.example.floor_myshop.controller;
 
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.example.floor_myshop.conditon.ProductCondition;
@@ -13,23 +10,20 @@ import com.example.floor_myshop.model.ApiResponse;
 import com.example.floor_myshop.model.ResponseCode;
 import com.example.floor_myshop.service.ICategoryService;
 import com.example.floor_myshop.service.IProductService;
-import com.example.floor_myshop.util.DateTimeUtils;
-import com.example.floor_myshop.util.QiNiuUtil;
 import com.example.floor_myshop.vo.ProductVo;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.example.floor_myshop.util.ControllerUtils.*;
 
 /**
  * <p>
@@ -53,13 +47,13 @@ public class ProductController {
 
     @PostMapping("/saveOrUpdateProduct")
     public ApiResponse addProduct(@RequestBody final ProductVo product){
-        trySetProductImg(product, product.getImgAddr(), (pv , p) -> pv.setImgAddr(p));
-        trySetProductImg(product, product.getPictureA(), (pv , p) -> pv.setPictureA(p));
-        trySetProductImg(product, product.getPictureB(), (pv , p) -> pv.setPictureB(p));
-        trySetProductImg(product, product.getPictureC(), (pv , p) -> pv.setPictureC(p));
-        trySetProductImg(product, product.getPictureD(), (pv , p) -> pv.setPictureD(p));
-        trySetProductImg(product, product.getPictureE(), (pv , p) -> pv.setPictureE(p));
-        trySetProductImg(product, product.getPictureF(), (pv , p) -> pv.setPictureF(p));
+        trySetImg(product, product.getImgAddr(), (pv , p) -> pv.setImgAddr(p));
+        trySetImg(product, product.getPictureA(), (pv , p) -> pv.setPictureA(p));
+        trySetImg(product, product.getPictureB(), (pv , p) -> pv.setPictureB(p));
+        trySetImg(product, product.getPictureC(), (pv , p) -> pv.setPictureC(p));
+        trySetImg(product, product.getPictureD(), (pv , p) -> pv.setPictureD(p));
+        trySetImg(product, product.getPictureE(), (pv , p) -> pv.setPictureE(p));
+        trySetImg(product, product.getPictureF(), (pv , p) -> pv.setPictureF(p));
 
         Category dbCate = categoryService.getOne(Wrappers.<Category>lambdaQuery().eq(Category::getCategoryName, product.getCategoryName()));
         if (dbCate==null){
@@ -84,20 +78,7 @@ public class ProductController {
         }
     }
 
-    private void trySetProductImg(ProductVo pv ,String  p,BiConsumer<ProductVo, String> consumer){
-        if (StringUtils.isNotBlank(p)){
-            final File destF = new File(
-                    UUID.randomUUID().toString(true) + ".png");
-            final File file = Base64.decodeToFile(p,destF);
-            QiNiuUtil.upload(file.getAbsolutePath(),file.getName(),true);
-            try {
-                final String fileUrl = QiNiuUtil.fileUrl(file.getName());
-                consumer.accept(pv,fileUrl);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 
     @PostMapping("/removeProduct/{id}")
     public ApiResponse removeProduct(@PathVariable("id") Integer id){
@@ -157,13 +138,6 @@ public class ProductController {
         return ApiResponse.success("获取商品列表成功",collect);
     }
 
-    private boolean checkALessThanB(Integer a, Integer b, Integer aBound){
-        return a!=null&&b!=null&&a>=aBound&&b>a;
-    }
-
-    private boolean checkALessThanBOnLocalDateTime(LocalDateTime a, LocalDateTime b){
-        return a!=null&&b!=null&&DateTime.of(DateTimeUtils.toDateFromLocalDateTime(a)).isBefore(DateTimeUtils.toDateFromLocalDateTime(b));
-    }
 
 
 }

@@ -40,7 +40,8 @@ public class OrderCondition implements Serializable {
 
     private Integer isDeleted;
 
-    private LocalDateTime createTime;
+    private LocalDateTime minCreateTime;
+    private LocalDateTime maxCreateTime;
 
     private String shopName;
 

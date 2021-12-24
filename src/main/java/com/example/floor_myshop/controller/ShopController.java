@@ -1,23 +1,20 @@
 package com.example.floor_myshop.controller;
 
 
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.floor_myshop.entity.ProductOrder;
 import com.example.floor_myshop.entity.Shop;
 import com.example.floor_myshop.model.ApiResponse;
 import com.example.floor_myshop.service.IProductOrderService;
 import com.example.floor_myshop.service.IShopService;
+import com.example.floor_myshop.util.ControllerUtils;
 import com.example.floor_myshop.util.DateTimeUtils;
 import com.example.floor_myshop.vo.StoreDashVo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.util.Date;
 
 /**
@@ -46,12 +43,7 @@ public class ShopController {
 
     @PostMapping("/updateStoreInfo")
     public ApiResponse updateStoreInfo(@RequestBody Shop reqShop){
-        if (StringUtils.isNotBlank(reqShop.getShopImg())){
-            final File destF = new File("/home/ulonglonggogo/MyDisk/PROJECTS/GradelProjects/floor_myshop/file_download_server/pictures/products/",
-                    UUID.randomUUID().toString(true) + ".png");
-            final File file = Base64.decodeToFile(reqShop.getShopImg(),destF);
-            reqShop.setShopImg("http://10.242.101.94:8002/pictures/products/"+file.getName());
-        }
+        ControllerUtils.trySetImg(reqShop,reqShop.getShopImg(),(pv, p) -> pv.setShopImg(p));
         if (shopService.updateById(reqShop)){
             final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery().eq(Shop::getShopId, reqShop.getShopId()));
             return ApiResponse.success("更新 店铺信息成功",one);
