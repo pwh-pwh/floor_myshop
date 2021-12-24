@@ -1,8 +1,15 @@
 package com.example.floor_myshop.controller;
 
 
+import com.example.floor_myshop.entity.HeadLine;
+import com.example.floor_myshop.model.ApiResponse;
+import com.example.floor_myshop.service.IHeadLineService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,6 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/headLine")
 public class HeadLineController {
+    @Autowired
+    IHeadLineService service;
+
+    @GetMapping("/all")
+    public ApiResponse headLine() {
+        List<HeadLine> list = service.list();
+        return ApiResponse.success("data",list);
+    }
 
 }
 
