@@ -1,4 +1,4 @@
-package com.example.floor_myshop.network;
+package com.example.floor_myshop.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +30,7 @@ public class ApiResponse<T> {
     public static <E> ApiResponse<E> success(E data) {
         return ApiResponse.success("请求成功", data);
     }
+
 
     /**
      * 请求成功

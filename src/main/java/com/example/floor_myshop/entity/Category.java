@@ -2,8 +2,14 @@ package com.example.floor_myshop.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.example.floor_myshop.vo.CategoryVo;
+import lombok.AllArgsConstructor;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -13,6 +19,7 @@ import java.time.LocalDateTime;
  * @author coderpwh
  * @since 2021-12-19
  */
+@AllArgsConstructor
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -112,4 +119,21 @@ public class Category implements Serializable {
         ", isDeleted=" + isDeleted +
         "}";
     }
+
+    public CategoryVo toCategoryVo(){
+        return new CategoryVo(categoryId,categoryName,categoryDesc,priority,createTime,lastEditTime,
+                shopId,isDeleted);
+    }
+
+    public static List<CategoryVo> toCategoryVoList(List<Category> categoryList){
+        final List<CategoryVo> collect = categoryList.stream().map(new Function<Category, CategoryVo>() {
+            @Override
+            public CategoryVo apply(Category category) {
+                return category.toCategoryVo();
+            }
+        }).collect(Collectors.toList());
+        return collect;
+    }
+
+
 }

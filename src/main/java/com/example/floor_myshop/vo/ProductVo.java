@@ -1,8 +1,6 @@
-package com.example.floor_myshop.entity;
+package com.example.floor_myshop.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.example.floor_myshop.vo.ProductVo;
+import com.example.floor_myshop.entity.Product;
 import lombok.*;
 
 import java.io.Serializable;
@@ -21,14 +19,15 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class Product implements Serializable {
+public class ProductVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "product_id", type = IdType.AUTO)
     private Integer productId;
 
     private Integer categoryId;
+
+    private String categoryName;
 
     private String productName;
 
@@ -59,11 +58,9 @@ public class Product implements Serializable {
     private String pictureE;
     private String pictureF;
 
-    public ProductVo toProductVo(String categoryName){
-        return new ProductVo(productId,categoryId,categoryName,productName,productDesc,imgAddr,normalPrice,promotionPrice,priority,
-                createTime,lastEditTime,enableStatus,shopId,isDeleted,stock,pictureA,pictureB,pictureC,pictureD,
-                pictureE,pictureF
-        );
+    public Product toProduct(){
+        return new Product(productId,categoryId,productName,productDesc,imgAddr,normalPrice,promotionPrice,priority,
+                createTime,lastEditTime,enableStatus,shopId,isDeleted,stock,pictureA,pictureB,pictureC,pictureD,pictureE,pictureF);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.example.floor_myshop.controller;
 
-import com.example.floor_myshop.network.ApiResponse;
+import com.example.floor_myshop.model.ApiResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

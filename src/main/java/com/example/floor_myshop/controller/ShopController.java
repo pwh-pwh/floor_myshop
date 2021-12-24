@@ -1,14 +1,24 @@
 package com.example.floor_myshop.controller;
 
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.lang.UUID;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.floor_myshop.entity.ProductOrder;
 import com.example.floor_myshop.entity.Shop;
-import com.example.floor_myshop.network.ApiResponse;
+import com.example.floor_myshop.model.ApiResponse;
+import com.example.floor_myshop.service.IProductOrderService;
 import com.example.floor_myshop.service.IShopService;
+import com.example.floor_myshop.util.DateTimeUtils;
+import com.example.floor_myshop.vo.StoreDashVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
+import java.util.Date;
 
 /**
  * <p>
@@ -25,13 +35,69 @@ public class ShopController {
     @Autowired
     private IShopService shopService;
 
-    @GetMapping("getStoreInfo/{id}")
-    public ApiResponse<Shop> getStoreInfo(@PathVariable("id") Integer id){
-        Shop res = shopService.getById(id);
-        return ApiResponse.success("查询店铺信息成功",res);
+    @Autowired
+    private IProductOrderService productOrderService;
+
+    @GetMapping("/getStoreInfo/{id}")
+    public ApiResponse getStoreInfo(@PathVariable("id") Integer id){
+        final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery().eq(Shop::getShopId, id));
+        return ApiResponse.success("查询店铺信息成功",one);
+    }
+
+    @PostMapping("/updateStoreInfo")
+    public ApiResponse updateStoreInfo(@RequestBody Shop reqShop){
+        if (StringUtils.isNotBlank(reqShop.getShopImg())){
+            final File destF = new File("/home/ulonglonggogo/MyDisk/PROJECTS/GradelProjects/floor_myshop/file_download_server/pictures/products/",
+                    UUID.randomUUID().toString(true) + ".png");
+            final File file = Base64.decodeToFile(reqShop.getShopImg(),destF);
+            reqShop.setShopImg("http://10.242.101.94:8002/pictures/products/"+file.getName());
+        }
+        if (shopService.updateById(reqShop)){
+            final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery().eq(Shop::getShopId, reqShop.getShopId()));
+            return ApiResponse.success("更新 店铺信息成功",one);
+        } else {
+            return ApiResponse.failed("更新店铺信息失败");
+        }
     }
 
 
+    @GetMapping("/getStoreDash/{id}")
+    public ApiResponse getStoreDash(@PathVariable("id") Integer id){
+        final Date yesterdayYesterday = DateTime.now().offset(DateField.DAY_OF_MONTH, -2).toJdkDate();
+        final Date yesterday = DateTime.now().offset(DateField.DAY_OF_MONTH, -1).toJdkDate();
+        final Date now = DateTime.now().toJdkDate();
+        final long yesterdayVisitCount = 1001;
+        final long todayVisitCount = 1002;
+        final long yesterdayOrderCount = productOrderService.count(Wrappers.<ProductOrder>lambdaQuery()
+                        .eq(ProductOrder::getShopId,id)
+                .between(ProductOrder::getCreateTime,
+                        DateTimeUtils.toLocalDateTimeFromDate(yesterdayYesterday),
+                        DateTimeUtils.toLocalDateTimeFromDate(yesterday)
+                )
+        );
+        final long todayOrderCount = productOrderService.count(Wrappers.<ProductOrder>lambdaQuery()
+                .eq(ProductOrder::getShopId,id)
+                .between(ProductOrder::getCreateTime,
+                        DateTimeUtils.toLocalDateTimeFromDate(yesterday),
+                        DateTimeUtils.toLocalDateTimeFromDate(now)
+                )
+        );
+        final long waitPayCount = productOrderService.count(Wrappers.<ProductOrder>lambdaQuery()
+                .eq(ProductOrder::getShopId,id)
+                .eq(ProductOrder::getOrderState,ProductOrder.WAIT_PAY)
+        );
+        final long waitSendGoodCount = productOrderService.count(Wrappers.<ProductOrder>lambdaQuery()
+                .eq(ProductOrder::getShopId,id)
+                .eq(ProductOrder::getOrderState,ProductOrder.WAIT_SEND_GOOD)
+        );
+        final long waitConfirmReceiveCount = productOrderService.count(Wrappers.<ProductOrder>lambdaQuery()
+                .eq(ProductOrder::getShopId,id)
+                .eq(ProductOrder::getOrderState,ProductOrder.WAIT_CONFIRM_RECEIVE)
+        );
 
+        return ApiResponse.success("查询店铺信息成功",new StoreDashVo((int)todayVisitCount,(int)yesterdayVisitCount,
+                (int)todayOrderCount,(int)yesterdayOrderCount,
+                (int)waitConfirmReceiveCount,(int)waitSendGoodCount,(int)waitPayCount));
+    }
 }
 

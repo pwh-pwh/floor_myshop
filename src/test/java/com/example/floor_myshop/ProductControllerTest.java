@@ -1,7 +1,7 @@
 package com.example.floor_myshop;
 
 import com.example.floor_myshop.entity.Product;
-import com.example.floor_myshop.network.ApiResponse;
+import com.example.floor_myshop.model.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
@@ -38,5 +38,7 @@ public class ProductControllerTest {
         final List<Product> data = response.getData();
         System.out.println(data);
     }
+
+
 
 }

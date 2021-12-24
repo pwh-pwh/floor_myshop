@@ -9,3 +9,17 @@ spring:
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+
+
+jwt:
+  config:
+    key: tong
+    ttl: 36000000000000
+mybatis-plus:
+  type-aliases-package: com.example.floor_myshop.entity
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.example.floor_myshop.mapper: debug
