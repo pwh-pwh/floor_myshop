@@ -38,7 +38,7 @@ public class OrderVo {
 
     private LocalDateTime createTime;
 
-    private String shopName;
+    private String productName;
     private String shopImg;
     private Integer onePrice;
     private Integer totalPrice;

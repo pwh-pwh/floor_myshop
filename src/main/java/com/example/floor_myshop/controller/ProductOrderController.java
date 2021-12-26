@@ -37,10 +37,9 @@ public class ProductOrderController {
 
     @Autowired
     private IProductOrderService productOrderService;
+
     @Autowired
     private IProductService productService;
-
-
 
     @PostMapping("/getOrderList")
     public ApiResponse getOrderList(
@@ -70,8 +69,8 @@ public class ProductOrderController {
         final List<OrderVo> collect = list.stream().map(new Function<ProductOrder, OrderVo>() {
             @Override
             public OrderVo apply(ProductOrder productOrder) {
-                final Product prot = productService.getOne(Wrappers.<Product>lambdaQuery().eq(Product::getProductId, orderCondition.getProductId()));
-                return productOrder.toOrderVo(orderCondition.getShopName(), orderCondition.getShopImg(),
+                final Product prot = productService.getOne(Wrappers.<Product>lambdaQuery().eq(Product::getProductId, productOrder.getProductId()));
+                return productOrder.toOrderVo(prot.getProductName(), prot.getImgAddr(),
                         prot.getNormalPrice(), null, null);
             }
         }).collect(Collectors.toList());
@@ -91,7 +90,7 @@ public class ProductOrderController {
         if (productOrderService.updateById(orderVo.toProductOrder())) {
             final ProductOrder productOrderServiceById = productOrderService.getById(orderVo.getOrderId());
             return ApiResponse.success("更新订单成功",
-                    productOrderServiceById.toOrderVo(orderVo.getShopName(),
+                    productOrderServiceById.toOrderVo(orderVo.getProductName(),
                             orderVo.getShopImg(),orderVo.getOnePrice(),orderVo.getTotalPrice(),
                             null
                     ));

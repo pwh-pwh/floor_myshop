@@ -57,22 +57,19 @@ public class ProductController {
 
         Category dbCate = categoryService.getOne(Wrappers.<Category>lambdaQuery().eq(Category::getCategoryName, product.getCategoryName()));
         if (dbCate==null){
-            if (!categoryService.save(new Category(null,product.getCategoryName(),"",0, LocalDateTime.now(),
-                    LocalDateTime.now(),product.getShopId(),0
-            ))) {
+            final Category dbCate1 = new Category(null, product.getCategoryName(), "", 0, LocalDateTime.now(),
+                    LocalDateTime.now(), product.getShopId(), 0
+            );
+            if (!categoryService.save(dbCate1)) {
                 return ApiResponse.failed("创建分类失败");
             } else {
-                dbCate = categoryService.getOne(Wrappers.<Category>lambdaQuery().eq(Category::getCategoryName, product.getCategoryName()));
+                dbCate = dbCate1;
             }
         }
         product.setCategoryId(dbCate.getCategoryId());
-        if (productService.saveOrUpdate(product.toProduct())) {
-            final HashMap<String, Object> queryM = new HashMap<>() {{
-                put("shop_id", product.getShopId());
-                put("product_name", product.getProductName());
-            }};
-            final Product one = productService.getOne(Wrappers.<Product>query().allEq(queryM));
-            return ApiResponse.success("添加或更新商品成功",one.toProductVo(product.getCategoryName()));
+        final Product prot1 = product.toProduct();
+        if (productService.saveOrUpdate(prot1)) {
+            return ApiResponse.success("添加或更新商品成功",prot1.toProductVo(product.getCategoryName()));
         } else {
             return ApiResponse.failed(ResponseCode.PRODUCT_IS_EXISTS.getMessage(),ResponseCode.PRODUCT_IS_EXISTS.getCode());
         }

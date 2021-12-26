@@ -37,7 +37,7 @@ public class ShopController {
 
     @GetMapping("/getStoreInfo/{id}")
     public ApiResponse getStoreInfo(@PathVariable("id") Integer id){
-        final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery().eq(Shop::getShopId, id));
+        final Shop one = shopService.getById(id);
         return ApiResponse.success("查询店铺信息成功",one);
     }
 
@@ -45,7 +45,7 @@ public class ShopController {
     public ApiResponse updateStoreInfo(@RequestBody Shop reqShop){
         ControllerUtils.trySetImg(reqShop,reqShop.getShopImg(),(pv, p) -> pv.setShopImg(p));
         if (shopService.updateById(reqShop)){
-            final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery().eq(Shop::getShopId, reqShop.getShopId()));
+            final Shop one = shopService.getById(reqShop.getShopId());
             return ApiResponse.success("更新 店铺信息成功",one);
         } else {
             return ApiResponse.failed("更新店铺信息失败");
