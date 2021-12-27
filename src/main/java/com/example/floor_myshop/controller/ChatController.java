@@ -19,9 +19,10 @@ public class ChatController {
 
     @PostMapping("/sendMessage")
     public ApiResponse sendMessage(@RequestBody ChatMessageVo chatMessageVo){
-        LinkedList<ChatMessageVo> deq = msgPool.get(chatMessageVo.getBId());
+        LinkedList<ChatMessageVo> deq = msgPool.get(chatMessageVo.getHostId());
         if (deq == null) {
             deq = new LinkedList<>();
+            msgPool.put(chatMessageVo.getHostId(),deq);
         }
         deq.addLast(chatMessageVo);
         return ApiResponse.success("发送消息成功");

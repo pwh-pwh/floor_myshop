@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.example.floor_myshop.model.ApiResponse.failed;
-
 /**
  * <p>
  *  前端控制器
@@ -44,6 +42,7 @@ public class AccountController {
         if (ObjectUtils.isEmpty(accountDb)) return ApiResponse.failed("账号名或者密码错误",503);
         return ApiResponse.success("登录成功",accountDb);
     }
+
 
 
 
