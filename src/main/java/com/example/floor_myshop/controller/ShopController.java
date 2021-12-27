@@ -41,6 +41,19 @@ public class ShopController {
         return ApiResponse.success("查询店铺信息成功",one);
     }
 
+    @GetMapping("/hasStore/{userId}")
+    public ApiResponse hasStore(@PathVariable("userId") Integer userId){
+        try {
+            final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery()
+                    .eq(Shop::getOwnerId, userId)
+            );
+            return ApiResponse.success("存在店铺",one);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ApiResponse.failed("不存在店铺");
+        }
+    }
+
     @PostMapping("/updateStoreInfo")
     public ApiResponse updateStoreInfo(@RequestBody Shop reqShop){
         ControllerUtils.trySetImg(reqShop,reqShop.getShopImg(),(pv, p) -> pv.setShopImg(p));
@@ -49,6 +62,24 @@ public class ShopController {
             return ApiResponse.success("更新 店铺信息成功",one);
         } else {
             return ApiResponse.failed("更新店铺信息失败");
+        }
+    }
+
+    @PostMapping("/createStore")
+    public ApiResponse createStore(@RequestBody Shop reqShop){
+        if (shopService.save(reqShop)) {
+            return ApiResponse.success("创建店铺成功",reqShop);
+        } else {
+            return ApiResponse.failed("创建店铺失败");
+        }
+    }
+
+    @PostMapping("/deleteStore")
+    public ApiResponse deleteStore(@RequestBody Shop reqShop){
+        if (shopService.removeById(reqShop)) {
+            return ApiResponse.success("删除店铺成功",reqShop);
+        } else {
+            return ApiResponse.failed("删除店铺失败");
         }
     }
 
