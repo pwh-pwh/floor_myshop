@@ -41,6 +41,19 @@ public class ShopController {
         return ApiResponse.success("查询店铺信息成功",one);
     }
 
+    @GetMapping("/hasStore/{userId}")
+    public ApiResponse hasStore(@PathVariable("userId") Integer userId){
+        try {
+            final Shop one = shopService.getOne(Wrappers.<Shop>lambdaQuery()
+                    .eq(Shop::getOwnerId, userId)
+            );
+            return ApiResponse.success("存在店铺",one);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ApiResponse.failed("不存在店铺");
+        }
+    }
+
     @PostMapping("/updateStoreInfo")
     public ApiResponse updateStoreInfo(@RequestBody Shop reqShop){
         ControllerUtils.trySetImg(reqShop,reqShop.getShopImg(),(pv, p) -> pv.setShopImg(p));
