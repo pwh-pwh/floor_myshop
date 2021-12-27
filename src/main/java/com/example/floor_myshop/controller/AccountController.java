@@ -7,6 +7,7 @@ import com.example.floor_myshop.entity.Person;
 import com.example.floor_myshop.model.ApiResponse;
 import com.example.floor_myshop.model.EmailModel;
 import com.example.floor_myshop.service.IAccountService;
+import com.example.floor_myshop.service.IPersonService;
 import com.example.floor_myshop.util.MailSendUtils;
 import com.example.floor_myshop.vo.AccountVo;
 import org.springframework.beans.BeanUtils;
@@ -34,7 +35,8 @@ import static com.example.floor_myshop.model.ApiResponse.failed;
 public class AccountController {
     @Autowired
     private IAccountService service;
-
+    @Autowired
+    private IPersonService personService;
     private String code;
 
     @Autowired
@@ -77,7 +79,8 @@ public class AccountController {
     public ApiResponse login(@RequestBody Account account) {
         Account accountDb = service.findByAc(account);
         if (ObjectUtils.isEmpty(accountDb)) return ApiResponse.failed("账号名或者密码错误",503);
-        return ApiResponse.success("登录成功",accountDb);
+        Person byId = personService.getById(account.getAccountId());
+        return ApiResponse.success(byId);
     }
 
 
