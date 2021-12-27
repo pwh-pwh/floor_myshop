@@ -8,6 +8,8 @@ import com.example.floor_myshop.model.ApiResponse;
 import com.example.floor_myshop.model.EmailModel;
 import com.example.floor_myshop.service.IAccountService;
 import com.example.floor_myshop.util.MailSendUtils;
+import com.example.floor_myshop.vo.AccountVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,11 +59,13 @@ public class AccountController {
 
 
     @PostMapping("/register")
-    public ApiResponse register(@RequestBody Account account){
-        if (!StringUtils.equals(code,account.getPassword())){
+    public ApiResponse register(@RequestBody AccountVo account){
+        if (!StringUtils.equals(code,account.getCd())){
             return ApiResponse.failed("校验码错误",500);
         }
-        Person p = service.register(account);
+        Account ac = new Account();
+        BeanUtils.copyProperties(account,ac);
+        Person p = service.register(ac);
         if (ObjectUtils.isEmpty(p)) {
             return ApiResponse.failed("注册失败",503);
         }
