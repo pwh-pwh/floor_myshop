@@ -52,6 +52,24 @@ public class ShopController {
         }
     }
 
+    @PostMapping("/createStore")
+    public ApiResponse createStore(@RequestBody Shop reqShop){
+        if (shopService.save(reqShop)) {
+            return ApiResponse.success("创建店铺成功",reqShop);
+        } else {
+            return ApiResponse.failed("创建店铺失败");
+        }
+    }
+
+    @PostMapping("/deleteStore")
+    public ApiResponse deleteStore(@RequestBody Shop reqShop){
+        if (shopService.removeById(reqShop)) {
+            return ApiResponse.success("删除店铺成功",reqShop);
+        } else {
+            return ApiResponse.failed("删除店铺失败");
+        }
+    }
+
 
     @GetMapping("/getStoreDash/{id}")
     public ApiResponse getStoreDash(@PathVariable("id") Integer id){

@@ -1,5 +1,6 @@
 package com.example.floor_myshop.vo;
 
+import com.example.floor_myshop.entity.Category;
 import lombok.*;
 
 import java.io.Serializable;
@@ -36,5 +37,10 @@ public class CategoryVo implements Serializable {
 
     private Integer isDeleted;
 
+    public Category toCategory(){
+        return new Category(categoryId,categoryName,categoryDesc, priority, createTime, lastEditTime,
+                shopId, isDeleted
+                );
+    }
 
 }

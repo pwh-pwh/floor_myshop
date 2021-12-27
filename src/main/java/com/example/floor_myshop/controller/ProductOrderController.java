@@ -100,6 +100,18 @@ public class ProductOrderController {
 
     }
 
+    @PostMapping("/addOrder")
+    public ApiResponse addOrder(@RequestBody OrderVo orderVo){
+        final ProductOrder productOrder = orderVo.toProductOrder();
+        if (productOrderService.save(productOrder)) {
+            final Product prot = productService.getById(productOrder.getProductId());
+            return ApiResponse.success("添加订单成功",productOrder.toOrderVo(prot.getProductName(),
+                    prot.getImgAddr(), prot.getNormalPrice(), null, null
+                    ));
+        } else {
+            return ApiResponse.failed("添加订单失败");
+        }
+    }
 
 }
 
