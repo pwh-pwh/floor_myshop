@@ -7,7 +7,10 @@ import com.example.floor_myshop.entity.Person;
 import com.example.floor_myshop.model.ApiResponse;
 import com.example.floor_myshop.model.EmailModel;
 import com.example.floor_myshop.service.IAccountService;
+import com.example.floor_myshop.service.IPersonService;
 import com.example.floor_myshop.util.MailSendUtils;
+import com.example.floor_myshop.vo.AccountVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +32,8 @@ import java.util.Random;
 public class AccountController {
     @Autowired
     private IAccountService service;
-
+    @Autowired
+    private IPersonService personService;
     private String code;
 
     @Autowired
@@ -54,11 +58,13 @@ public class AccountController {
 
 
     @PostMapping("/register")
-    public ApiResponse register(@RequestBody Account account){
-        if (!StringUtils.equals(code,account.getPassword())){
+    public ApiResponse register(@RequestBody AccountVo account){
+        if (!StringUtils.equals(code,account.getCd())){
             return ApiResponse.failed("校验码错误",500);
         }
-        Person p = service.register(account);
+        Account ac = new Account();
+        BeanUtils.copyProperties(account,ac);
+        Person p = service.register(ac);
         if (ObjectUtils.isEmpty(p)) {
             return ApiResponse.failed("注册失败",503);
         }
@@ -72,9 +78,9 @@ public class AccountController {
     public ApiResponse login(@RequestBody Account account) {
         Account accountDb = service.findByAc(account);
         if (ObjectUtils.isEmpty(accountDb)) return ApiResponse.failed("账号名或者密码错误",503);
-        return ApiResponse.success("登录成功",accountDb);
+        Person byId = personService.getById(accountDb.getAccountId());
+        return ApiResponse.success(byId);
     }
-
 
 
 
