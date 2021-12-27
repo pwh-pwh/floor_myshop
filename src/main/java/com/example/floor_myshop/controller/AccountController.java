@@ -79,7 +79,7 @@ public class AccountController {
     public ApiResponse login(@RequestBody Account account) {
         Account accountDb = service.findByAc(account);
         if (ObjectUtils.isEmpty(accountDb)) return ApiResponse.failed("账号名或者密码错误",503);
-        Person byId = personService.getById(account.getAccountId());
+        Person byId = personService.getById(accountDb.getAccountId());
         return ApiResponse.success(byId);
     }
 
