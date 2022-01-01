@@ -14,28 +14,24 @@ public class JwtFilter implements HandlerInterceptor {
 
 //    @Override
 //    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//        String authHeader = request.getHeader("token");
-//        if (authHeader != null) {
-//            final String token = authHeader; // The part
-//            try {
-//                Claims claims = jwtUtil.parseJWT(token);
-//                if (claims != null) {
-//                    if("merchant".equals(claims.get("roles"))){//如果是用户
-//                        request.setAttribute("merchant_claims", claims);
-//                        return true;
-//                    } else {
-//                        new RuntimeException("token角色错误").printStackTrace();
-//                        return false;
-//                    }
-//                }
-//            }catch (Exception e){
-//                e.printStackTrace();
-//                new RuntimeException("token解析异常").printStackTrace();
-//                return false;
-//            }
+//        final String token = request.getHeader("token");
+//        if (token == null) {
+//            new RuntimeException("无token字段 header").printStackTrace();
+//            return false;
 //        }
-//        new RuntimeException("无token字段 header").printStackTrace();
-//        return false;
+//        Claims claims = jwtUtil.parseJWT(token);
+//        if (claims==null){
+//            new RuntimeException("无法正确解析token").printStackTrace();
+//            return false;
+//        }
+//        if (claims.getExpiration().before(new Date())) {
+//            new RuntimeException("token 已过期").printStackTrace();
+//            return false;
+//        }
+//        if("merchant".equals(claims.get("roles"))){//如果是用户
+//            request.setAttribute("merchant_claims", claims);
+//        }
+//        return true;
 //    }
 
 

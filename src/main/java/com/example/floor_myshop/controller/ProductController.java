@@ -14,6 +14,7 @@ import com.example.floor_myshop.vo.ProductVo;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -44,7 +45,7 @@ public class ProductController {
     @Autowired
     private ICategoryService categoryService;
 
-
+    @Transactional
     @PostMapping("/saveOrUpdateProduct")
     public ApiResponse addProduct(@RequestBody final ProductVo product){
         trySetImg(product, product.getImgAddr(), (pv , p) -> pv.setImgAddr(p));
@@ -54,8 +55,15 @@ public class ProductController {
         trySetImg(product, product.getPictureD(), (pv , p) -> pv.setPictureD(p));
         trySetImg(product, product.getPictureE(), (pv , p) -> pv.setPictureE(p));
         trySetImg(product, product.getPictureF(), (pv , p) -> pv.setPictureF(p));
-
-        Category dbCate = categoryService.getOne(Wrappers.<Category>lambdaQuery().eq(Category::getCategoryName, product.getCategoryName()));
+        if ("".equals(product.getCategoryName())){
+            product.setCategoryName(null);
+        }
+        Map<SFunction<Category,?>, Object> mapCate = new HashMap<>();
+        mapCate.put(Category::getCategoryName,product.getCategoryName());
+        mapCate.put(Category::getShopId,product.getShopId());
+        Category dbCate = categoryService.getOne(Wrappers.<Category>lambdaQuery()
+                .allEq(mapCate)
+        );
         if (dbCate==null){
             final Category dbCate1 = new Category(null, product.getCategoryName(), "", 0, LocalDateTime.now(),
                     LocalDateTime.now(), product.getShopId(), 0
@@ -91,12 +99,15 @@ public class ProductController {
     public ApiResponse getProductList(
             @RequestBody ProductCondition productCondition
             ) {
-        final Category cateOne = categoryService.getOne(Wrappers.<Category>lambdaQuery()
-                .eq(StringUtils.isNotBlank(productCondition.getCategoryName()),
-                        Category::getCategoryName, productCondition.getCategoryName()));
+        Category cateOne = null;
+        Map<SFunction<Category,?>, Object> mapCate = new HashMap<>();
+        mapCate.put(Category::getCategoryName,productCondition.getCategoryName());
+        mapCate.put(Category::getShopId,productCondition.getShopId());
+        cateOne = categoryService.getOne(Wrappers.<Category>lambdaQuery()
+                .allEq(mapCate)
+        );
         Map<SFunction<Product,?>, Object> map = new HashMap<>();
         map.put(Product::getProductId,productCondition.getProductId());
-        map.put(Product::getShopId,productCondition.getShopId());
         map.put(Product::getIsDeleted,productCondition.getIsDeleted());
         map.put(Product::getEnableStatus,productCondition.getEnableStatus());
         if (productCondition.getCategoryId()!=null){
@@ -125,6 +136,7 @@ public class ProductController {
                 .between(checkALessThanB(productCondition.getMinStock(),productCondition.getMaxStock(),0),
                         Product::getStock,productCondition.getMinStock(),productCondition.getMaxStock()
                 )
+                        .eq(Product::getShopId,productCondition.getShopId())
                 .allEq(map, false));
         final List<ProductVo> collect = list.stream().map(new Function<Product, ProductVo>() {
             @Override

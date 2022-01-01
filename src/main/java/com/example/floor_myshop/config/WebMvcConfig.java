@@ -23,8 +23,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         List<String> exList = new ArrayList<>();
-        exList.add("/**/login");
-        exList.add("/**/register");
+        exList.add("/account/**");
         exList.add("/doc.html/**");
         Collections.addAll(exList,"/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
         registry.addInterceptor(jwtFilter).

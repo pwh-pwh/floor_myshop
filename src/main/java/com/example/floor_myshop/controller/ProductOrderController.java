@@ -64,6 +64,7 @@ public class ProductOrderController {
                 .between(checkALessThanB(orderCondition.getMinAmount(),orderCondition.getMaxAmount(),0),
                         ProductOrder::getAmount,orderCondition.getMinAmount(),orderCondition.getMaxAmount()
                 )
+                .eq(ProductOrder::getShopId,orderCondition.getShopId())
                 .allEq(map, false)
         );
         final List<OrderVo> collect = list.stream().map(new Function<ProductOrder, OrderVo>() {
@@ -91,7 +92,7 @@ public class ProductOrderController {
             final ProductOrder productOrderServiceById = productOrderService.getById(orderVo.getOrderId());
             return ApiResponse.success("更新订单成功",
                     productOrderServiceById.toOrderVo(orderVo.getProductName(),
-                            orderVo.getShopImg(),orderVo.getOnePrice(),orderVo.getTotalPrice(),
+                            orderVo.getProductImg(),orderVo.getOnePrice(),orderVo.getTotalPrice(),
                             null
                     ));
         } else {

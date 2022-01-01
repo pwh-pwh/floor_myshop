@@ -4,15 +4,20 @@ package com.example.floor_myshop.controller;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.floor_myshop.entity.Person;
 import com.example.floor_myshop.entity.ProductOrder;
 import com.example.floor_myshop.entity.Shop;
 import com.example.floor_myshop.model.ApiResponse;
+import com.example.floor_myshop.service.IPersonService;
 import com.example.floor_myshop.service.IProductOrderService;
 import com.example.floor_myshop.service.IShopService;
 import com.example.floor_myshop.util.ControllerUtils;
 import com.example.floor_myshop.util.DateTimeUtils;
 import com.example.floor_myshop.vo.StoreDashVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -34,6 +39,12 @@ public class ShopController {
 
     @Autowired
     private IProductOrderService productOrderService;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    @Autowired
+    private IPersonService personService;
 
     @GetMapping("/getStoreInfo/{id}")
     public ApiResponse getStoreInfo(@PathVariable("id") Integer id){
@@ -57,9 +68,32 @@ public class ShopController {
     @PostMapping("/updateStoreInfo")
     public ApiResponse updateStoreInfo(@RequestBody Shop reqShop){
         ControllerUtils.trySetImg(reqShop,reqShop.getShopImg(),(pv, p) -> pv.setShopImg(p));
-        if (shopService.updateById(reqShop)){
-            final Shop one = shopService.getById(reqShop.getShopId());
-            return ApiResponse.success("更新 店铺信息成功",one);
+        final Shop[] one = {null};
+        final Boolean success = transactionTemplate.execute(new TransactionCallback<Boolean>() {
+            @Override
+            public Boolean doInTransaction(TransactionStatus status) {
+                try {
+                    if (shopService.updateById(reqShop)){
+                        one[0] = shopService.getById(reqShop.getShopId());
+                        if (reqShop.getShopImg()==null){
+                            return true;
+                        }
+                        final Person person = new Person();
+                        person.setUserId(one[0].getOwnerId());
+                        person.setProfileImg(one[0].getShopImg());
+                        if (personService.updateById(person)) {
+                            return true;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    status.setRollbackOnly();
+                }
+                return false;
+            }
+        });
+        if (success){
+            return ApiResponse.success("更新 店铺信息成功", one[0]);
         } else {
             return ApiResponse.failed("更新店铺信息失败");
         }

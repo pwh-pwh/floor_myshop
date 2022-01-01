@@ -57,6 +57,8 @@ public class JwtUtil {
         return builder.compact();
     }
 
+
+
     /**
      * 解析JWT
      * @param jwtStr

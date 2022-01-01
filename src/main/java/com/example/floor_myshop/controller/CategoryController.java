@@ -40,15 +40,17 @@ public class CategoryController {
             map.put(Category::getCategoryId,categoryCondition.getCategoryId());
             map.put(Category::getShopId,categoryCondition.getShopId());
             map.put(Category::getIsDeleted,categoryCondition.getIsDeleted());
-            if (categoryCondition.getIsExactCategoryName()!=null&&categoryCondition.getIsExactCategoryName()){
+            if (categoryCondition.getIsExactCategoryName()!=null&& categoryCondition.getIsExactCategoryName()){
                 map.put(Category::getCategoryName,categoryCondition.getCategoryName());
+            } else {
+                categoryCondition.setIsExactCategoryName(false);
             }
             final List<Category> list = categoryService.list(Wrappers.<Category>lambdaQuery()
                     .like(!categoryCondition.getIsExactCategoryName() && StringUtils.isNotBlank(categoryCondition.getCategoryName()), Category::getCategoryName, categoryCondition.getCategoryName())
                     .like(StringUtils.isNotBlank(categoryCondition.getCategoryDesc()), Category::getCategoryDesc, categoryCondition.getCategoryDesc())
                     .between(ControllerUtils.checkALessThanB(categoryCondition.getMinPriority(), categoryCondition.getMaxPriority(), 0),
                             Category::getPriority, categoryCondition.getMinPriority(), categoryCondition.getMaxPriority())
-                    .allEq(map)
+                    .allEq(map,false)
             );
             categoryVos = Category.toCategoryVoList(list);
             return ApiResponse.success("获取分类列表成功",categoryVos);

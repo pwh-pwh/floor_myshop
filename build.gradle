@@ -58,9 +58,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
     implementation 'org.springframework.boot:spring-boot-starter-mail:2.2.2.RELEASE'
 
-
-
-
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 

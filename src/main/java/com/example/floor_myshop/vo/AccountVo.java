@@ -3,6 +3,7 @@ package com.example.floor_myshop.vo;
 import java.io.Serializable;
 
 public class AccountVo implements Serializable {
+
     private String userName;
     private String password;
     private String cd;

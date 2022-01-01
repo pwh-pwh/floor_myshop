@@ -2,7 +2,6 @@ package com.example.floor_myshop;
 
 import com.example.floor_myshop.entity.Account;
 import com.example.floor_myshop.service.IAccountService;
-import com.example.floor_myshop.service.impl.AccountServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +12,7 @@ import java.time.LocalDateTime;
 public class AccountServiceTest {
     @Autowired
     IAccountService accountService;
+
 
     @Test
     void testRegist() {
